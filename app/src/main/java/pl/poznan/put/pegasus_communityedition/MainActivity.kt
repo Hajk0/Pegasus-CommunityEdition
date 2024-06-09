@@ -24,6 +24,15 @@ import pl.poznan.put.pegasus_communityedition.ui.navigation.Navigation
 import pl.poznan.put.pegasus_communityedition.ui.theme.PegasusCommunityEditionTheme
 import java.io.File
 import android.Manifest
+import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.core.content.IntentCompat
+import pl.poznan.put.pegasus_communityedition.ui.services.TrackingService
 
 class MainActivity : ComponentActivity() {
 
@@ -39,11 +48,23 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ActivityCompat.requestPermissions(
+        /*ActivityCompat.requestPermissions(
             this,
-            arrayOf(Manifest.permission.RECORD_AUDIO),
+            arrayOf(
+                Manifest.permission.RECORD_AUDIO,
+            ),
             200
-        )
+        )*/
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ),
+                200
+            )
+        }
         setContent {
             PegasusCommunityEditionTheme {
                 // A surface container using the 'background' color from the theme
@@ -78,6 +99,22 @@ class MainActivity : ComponentActivity() {
                             player.stop()
                         }) {
                             Text(text = "Stop playing")
+                        }
+                        Button(onClick = {
+                            Intent(applicationContext, TrackingService::class.java).also {
+                                it.action = TrackingService.Actions.START.toString()
+                                startService(it)
+                            }
+                        }) {
+                            Text(text = "Start foreground service")
+                        }
+                        Button(onClick = {
+                            Intent(applicationContext, TrackingService::class.java).also {
+                                it.action = TrackingService.Actions.STOP.toString()
+                                startService(it)
+                            }
+                        }) {
+                            Text(text = "Stop foreground service")
                         }
                         NavBar(navController)
                     }
