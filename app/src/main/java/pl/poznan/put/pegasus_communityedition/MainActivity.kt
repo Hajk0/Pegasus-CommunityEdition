@@ -48,18 +48,28 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.POST_NOTIFICATIONS,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                ),
-                0
-            )
+        val permissionArray = mutableListOf(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            permissionArray.add(Manifest.permission.FOREGROUND_SERVICE)
         }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionArray.add(Manifest.permission.POST_NOTIFICATIONS)
+            permissionArray.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            permissionArray.add(Manifest.permission.FOREGROUND_SERVICE_MICROPHONE)
+            permissionArray.add(Manifest.permission.FOREGROUND_SERVICE_LOCATION)
+        }
+
+        ActivityCompat.requestPermissions(
+            this,
+            permissionArray.toTypedArray(),
+            0
+        )
         setContent {
             PegasusCommunityEditionTheme {
                 // A surface container using the 'background' color from the theme

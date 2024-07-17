@@ -1,8 +1,7 @@
-package pl.poznan.put.pegasus_communityedition.ui.services
+package pl.poznan.put.pegasus_communityedition.ui.services.location
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.health.connect.datatypes.ExerciseRoute
 import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
@@ -15,7 +14,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
-import pl.poznan.put.pegasus_communityedition.ui.services.location.LocationClient
+import pl.poznan.put.pegasus_communityedition.ui.services.hasLocationPermission
 
 class DefaultLocationClient(
     private val context: Context,

@@ -5,10 +5,9 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.location.Location
-import android.os.Build
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.os.IBinder
-import androidx.annotation.RequiresApi
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +18,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import pl.poznan.put.pegasus_communityedition.R
-import pl.poznan.put.pegasus_communityedition.ui.audio.AudioPlayer
+import pl.poznan.put.pegasus_communityedition.ui.audio.AudioRecorder
+import pl.poznan.put.pegasus_communityedition.ui.services.audio.AudioClient
+import pl.poznan.put.pegasus_communityedition.ui.services.audio.DefaultAudioClient
+import pl.poznan.put.pegasus_communityedition.ui.services.location.DefaultLocationClient
 import pl.poznan.put.pegasus_communityedition.ui.services.location.LocationClient
 
 
@@ -27,6 +29,10 @@ class TrackingService: Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var locationClient: LocationClient
+    private lateinit var audioClient: AudioClient
+    private val recorder by lazy {
+        AudioRecorder(applicationContext)
+    }
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -37,6 +43,11 @@ class TrackingService: Service() {
         locationClient = DefaultLocationClient(
             applicationContext,
             LocationServices.getFusedLocationProviderClient(applicationContext)
+        )
+
+        audioClient = DefaultAudioClient(
+            applicationContext,
+            recorder
         )
     }
 
@@ -59,7 +70,7 @@ class TrackingService: Service() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         locationClient
-            .getLocationUpdates(1000L)
+            .getLocationUpdates(10000L)
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
                 val lat = location.latitude.toString()
@@ -67,11 +78,22 @@ class TrackingService: Service() {
                 val updatedNotification = notification.setContentText(
                     "Location: ($lat, $long)"
                 )
+                Log.println(Log.DEBUG, "X(", "Siemano 2")
                 notificationManager.notify(1, updatedNotification.build())
             }
             .launchIn(serviceScope)
 
-        startForeground(1, notification.build())
+        audioClient
+            .getAudioSample(10000L)
+            .catch { e -> e.printStackTrace() }
+            .onEach { audioFile ->
+                // TODO( Store in database )
+                Log.println(Log.DEBUG, "XD", "Siemano")
+            }
+            .launchIn(serviceScope)
+
+        startForeground(1,
+            notification.build())
     }
 
     private fun stop() {

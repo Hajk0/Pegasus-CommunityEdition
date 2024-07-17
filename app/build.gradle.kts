@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("kotlin-kapt")
 }
 
 android {
@@ -74,4 +75,9 @@ dependencies {
     // Location Services
     val locationVersion = "21.3.0"
     implementation("com.google.android.gms:play-services-location:$locationVersion")
+
+    // Room
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-ktx:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
 }
