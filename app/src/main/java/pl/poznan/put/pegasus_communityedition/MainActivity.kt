@@ -48,21 +48,16 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /*ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.RECORD_AUDIO,
-            ),
-            200
-        )*/
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
                     Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.POST_NOTIFICATIONS
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
                 ),
-                200
+                0
             )
         }
         setContent {
