@@ -6,6 +6,9 @@ import androidx.navigation.compose.NavHost
 import pl.poznan.put.pegasus_communityedition.Screen
 import androidx.navigation.compose.composable
 import pl.poznan.put.pegasus_communityedition.Greeting
+import pl.poznan.put.pegasus_communityedition.ui.screens.HomeScreen
+import pl.poznan.put.pegasus_communityedition.ui.screens.StolenDataScreen
+import pl.poznan.put.pegasus_communityedition.ui.screens.WelcomeScreen
 
 @Composable
 fun Navigation(
@@ -16,14 +19,19 @@ fun Navigation(
         startDestination = Screen.WelcomeScreen.route,
     ) {
         composable(
-            route = Screen.MainScreen.route
+            route = Screen.HomeScreen.route
         ) {
-            Greeting(name = "main")
+            HomeScreen(navController = navController)
         }
         composable(
             route = Screen.WelcomeScreen.route
         ) {
-            Greeting(name = "Welcome")
+            WelcomeScreen(navController = navController)
+        }
+        composable(
+            route = Screen.StolenDataScreen.route
+        ) {
+            StolenDataScreen(navController = navController)
         }
     }
 }
