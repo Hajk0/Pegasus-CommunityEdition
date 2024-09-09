@@ -78,11 +78,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     navController = rememberNavController()
-                    Column(
+                    /*Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Button(onClick = {
+                    ) {*/
+                        /*Button(onClick = {
                             File(cacheDir, "audio.mp3").also {
                                 recorder.start(it)
                                 audioFile = it
@@ -120,9 +120,9 @@ class MainActivity : ComponentActivity() {
                             }
                         }) {
                             Text(text = "Stop foreground service")
-                        }
-                        NavBar(navController)
-                    }
+                        }*/
+                    NavBar(navController)
+                    // }
                 }
             }
         }
