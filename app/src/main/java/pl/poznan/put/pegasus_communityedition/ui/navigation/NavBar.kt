@@ -69,7 +69,12 @@ fun NavBar(navController: NavHostController) {
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            Navigation(navController = navController)
+            Navigation(
+                navController = navController,
+                onSelectedItemIndexChange = {
+                    selectedItemIndex = it
+                },
+            )
         }
     }
 }

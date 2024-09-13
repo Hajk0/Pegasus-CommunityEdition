@@ -18,17 +18,17 @@ import pl.poznan.put.pegasus_communityedition.Screen
 import androidx.navigation.compose.composable
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
-import pl.poznan.put.pegasus_communityedition.Greeting
 import pl.poznan.put.pegasus_communityedition.ui.screens.HomeScreen
+import pl.poznan.put.pegasus_communityedition.ui.screens.ProfileScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.StolenDataScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.WelcomeScreen
 import pl.poznan.put.pegasus_communityedition.ui.sign_in.GoogleAuthUiClient
 import pl.poznan.put.pegasus_communityedition.ui.sign_in.SignInViewModel
-import kotlin.coroutines.coroutineContext
 
 @Composable
 fun Navigation(
     navController: NavHostController,
+    onSelectedItemIndexChange: (Int) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val appContext = LocalContext.current.applicationContext
@@ -45,7 +45,28 @@ fun Navigation(
         composable(
             route = Screen.HomeScreen.route
         ) {
-            HomeScreen(
+            TopBar(
+                ScreenComposable = {
+                    HomeScreen(
+                        navController = navController,
+                        userData = googleAuthUiClient.getSignedInUser(),
+                        onSignOut = {
+                            coroutineScope.launch {
+                                googleAuthUiClient.signOut()
+                                Toast.makeText(
+                                    appContext,
+                                    "Signed out",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                navController.navigate(Screen.WelcomeScreen.route)
+                                onSelectedItemIndexChange(0)
+                            }
+                        }
+                    )
+                }, title = "Home"
+            )
+            /*HomeScreen(
                 navController = navController,
                 userData = googleAuthUiClient.getSignedInUser(),
                 onSignOut = {
@@ -60,7 +81,7 @@ fun Navigation(
                         navController.navigate(Screen.WelcomeScreen.route)
                     }
                 }
-            )
+            )*/
         }
         composable(
             route = Screen.WelcomeScreen.route
@@ -101,6 +122,26 @@ fun Navigation(
                 }
             }
 
+            TopBar(
+                ScreenComposable = {
+                    WelcomeScreen(
+                        navController = navController,
+                        state = state,
+                        onSignInState = {
+                            coroutineScope.launch {
+                                val signInIntentSender = googleAuthUiClient.signIn()
+                                launcher.launch(
+                                    IntentSenderRequest.Builder(
+                                        signInIntentSender ?: return@launch
+                                    ).build()
+                                )
+                            }
+                        }
+                    )
+                },
+                title = "Welcome",
+            )
+            /*
             WelcomeScreen(
                 navController = navController,
                 state = state,
@@ -115,11 +156,37 @@ fun Navigation(
                     }
                 }
             )
+            */
         }
         composable(
             route = Screen.StolenDataScreen.route
         ) {
-            StolenDataScreen(navController = navController)
+            TopBar(
+                ScreenComposable = {
+                    StolenDataScreen(navController = navController)
+                },
+                title = "Stolen Data"
+            )
+            // StolenDataScreen(navController = navController)
+        }
+        composable(
+            route = Screen.ProfileScreen.route
+        ) {
+            ProfileScreen(
+                navController = navController,
+                userData = googleAuthUiClient.getSignedInUser(),
+                onSignOut = {
+                    coroutineScope.launch {
+                        googleAuthUiClient.signOut()
+                        Toast.makeText(
+                            appContext,
+                            "Signed out",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        navController.navigate(Screen.WelcomeScreen.route)
+                    }
+                }
+            )
         }
     }
 }
