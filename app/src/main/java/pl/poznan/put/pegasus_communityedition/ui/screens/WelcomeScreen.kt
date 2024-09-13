@@ -41,7 +41,7 @@ fun WelcomeScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Button(onClick = onSignInState/*{ onLogInClick(navController) }*/) {
+        Button(onClick = onSignInState) {
             Text(text = "Sign in")
         }
     }
