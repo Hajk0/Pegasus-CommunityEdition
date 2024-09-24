@@ -77,7 +77,7 @@ fun Navigation(
                         onObjectIdChanged = { homeViewModel.updateObcjectId(id = it) },
                         onInsertClicked = { homeViewModel.insertNote() },
                         onUpdateClicked = { homeViewModel.updateNote() },
-                        onDeleteClicked = { homeViewModel.deleteNote() },
+                        onDelete = { note -> homeViewModel.deleteNote(note) },
                     )
                 }, title = "Home"
             )

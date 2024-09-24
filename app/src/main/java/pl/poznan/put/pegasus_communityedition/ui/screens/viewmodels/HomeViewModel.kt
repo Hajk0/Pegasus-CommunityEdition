@@ -135,4 +135,18 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
             }
         }
     }
+
+    fun deleteNote(notePar: Note) {
+        viewModelScope.launch {
+            val id = notePar._id
+            realm.write {
+                val note = query<Note>(query = "_id == $0", id).first().find()
+                try {
+                    note?.let { delete(it) }
+                } catch (e: Exception) {
+                    Log.d("HomeViewModel", "${e.message}")
+                }
+            }
+        }
+    }
 }
