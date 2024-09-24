@@ -1,6 +1,8 @@
 package pl.poznan.put.pegasus_communityedition.ui.navigation
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -16,13 +18,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import pl.poznan.put.pegasus_communityedition.Screen
 import androidx.navigation.compose.composable
-import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import pl.poznan.put.pegasus_communityedition.ui.screens.HistoryScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.HomeScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.ProfileScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.StolenDataScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.WelcomeScreen
+import pl.poznan.put.pegasus_communityedition.ui.screens.viewmodels.HomeViewModel
+import pl.poznan.put.pegasus_communityedition.ui.screens.viewmodels.HomeViewModelFactory
+import pl.poznan.put.pegasus_communityedition.ui.services.TrackingService
 import pl.poznan.put.pegasus_communityedition.ui.sign_in.GoogleAuthUiClient
 import pl.poznan.put.pegasus_communityedition.ui.sign_in.SignInViewModel
 
@@ -34,6 +38,11 @@ fun Navigation(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val appContext = LocalContext.current.applicationContext
+    val userEmail = googleAuthUiClient.getSignedInUser()?.userEmail
+    val homeViewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(userEmail.toString())
+    )
+    val notes by homeViewModel.notes
     NavHost(
         navController = navController,
         startDestination = Screen.WelcomeScreen.route,
@@ -59,6 +68,16 @@ fun Navigation(
                                 onSelectedItemIndexChange(Screen.WelcomeScreen.id)
                             }
                         },
+                        notes = notes,
+                        title = homeViewModel.title.value,
+                        content = homeViewModel.content.value,
+                        objectId = homeViewModel.objectId.value,
+                        onTitleChanged = { homeViewModel.updateTitle(title = it) },
+                        onContentChanged = { homeViewModel.updateContent(content = it) },
+                        onObjectIdChanged = { homeViewModel.updateObcjectId(id = it) },
+                        onInsertClicked = { homeViewModel.insertNote() },
+                        onUpdateClicked = { homeViewModel.updateNote() },
+                        onDeleteClicked = { homeViewModel.deleteNote() },
                     )
                 }, title = "Home"
             )
@@ -101,6 +120,7 @@ fun Navigation(
                     navController.navigate(Screen.HomeScreen.route)
                     onSelectedItemIndexChange(Screen.HomeScreen.id)
                     viewModel.resetState()
+                    homeViewModel.updateUserName(googleAuthUiClient.getSignedInUser()?.userEmail.toString())
                 }
             }
 
@@ -118,6 +138,7 @@ fun Navigation(
                                     ).build()
                                 )
                             }
+                            startService(appContext)
                         }
                     )
                 },
@@ -153,6 +174,7 @@ fun Navigation(
                                 navController.navigate(Screen.WelcomeScreen.route)
                                 onSelectedItemIndexChange(Screen.WelcomeScreen.id)
                             }
+                            stopService(appContext)
                         }
                     )
                 },
@@ -169,5 +191,19 @@ fun Navigation(
                 title = "History"
             )
         }
+    }
+}
+
+private fun startService(appContext: Context) {
+    Intent(appContext, TrackingService::class.java).also {
+        it.action = TrackingService.Actions.START.toString()
+        appContext.startService(it)
+    }
+}
+
+private fun stopService(appContext: Context) {
+    Intent(appContext, TrackingService::class.java).also {
+        it.action = TrackingService.Actions.STOP.toString()
+        appContext.startService(it)
     }
 }
