@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import pl.poznan.put.pegasus_communityedition.Screen
 import pl.poznan.put.pegasus_communityedition.ui.components.NotesList
 import pl.poznan.put.pegasus_communityedition.ui.data.model.Note
 import pl.poznan.put.pegasus_communityedition.ui.sign_in.UserData
@@ -33,6 +34,7 @@ fun HomeScreen(
     onInsertClicked: () -> Unit,
     onUpdateClicked: () -> Unit,
     onDelete: (Note) -> Unit,
+    onDetail: (Note) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -80,7 +82,9 @@ fun HomeScreen(
             onDelete = { note ->
                 onDelete(note)
             },
-            onDetail = { note -> return@NotesList },
+            onDetail = { note ->
+                onDetail(note)
+            },
         )
     }
 }

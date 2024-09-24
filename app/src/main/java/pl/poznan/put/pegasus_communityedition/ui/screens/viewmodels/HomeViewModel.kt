@@ -20,6 +20,7 @@ import pl.poznan.put.pegasus_communityedition.ui.services.TrackingApp
 class HomeViewModel(var userEmail: String) : ViewModel() {
 
     private val realm = TrackingApp.realm
+    var note: Note? = null
 
     private fun createSampleEntries() {
         viewModelScope.launch {
@@ -72,7 +73,7 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
         this.content.value = content
     }
 
-    fun updateObcjectId(id: String) {
+    fun updateObjectId(id: String) {
         this.objectId.value = id
     }
 
@@ -89,6 +90,19 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
                 emptyList()
             )
     }
+
+    fun getNoteById(id: String) : Note? {
+        note = realm
+            .query<Note>(query = "_id == $0", ObjectId(hexString = id))
+            .first()
+            .find()
+        return note
+    }
+
+    fun getLastNote() : Note? {
+        return note
+    }
+
     fun insertNote() {
         viewModelScope.launch(Dispatchers.IO) {
             if (title.value.isNotEmpty()) {
@@ -115,22 +129,6 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
                     val queriedNote = query<Note>(query = "_id == $0", note._id).first().find()
                     queriedNote?.title = note.title
                     queriedNote?.content = note.content
-                }
-            }
-        }
-    }
-
-    fun deleteNote() {
-        viewModelScope.launch {
-            if (objectId.value.isNotEmpty()) {
-                val id = ObjectId(hexString = objectId.value)
-                realm.write {
-                    val note = query<Note>(query = "_id == $0", id).first().find()
-                    try {
-                        note?.let { delete(it) }
-                    } catch (e: Exception) {
-                        Log.d("HomeViewModel", "${e.message}")
-                    }
                 }
             }
         }

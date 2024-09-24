@@ -15,11 +15,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import pl.poznan.put.pegasus_communityedition.Screen
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
-import pl.poznan.put.pegasus_communityedition.ui.screens.HistoryScreen
+import pl.poznan.put.pegasus_communityedition.ui.screens.DetailsScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.HomeScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.ProfileScreen
 import pl.poznan.put.pegasus_communityedition.ui.screens.StolenDataScreen
@@ -74,10 +76,14 @@ fun Navigation(
                         objectId = homeViewModel.objectId.value,
                         onTitleChanged = { homeViewModel.updateTitle(title = it) },
                         onContentChanged = { homeViewModel.updateContent(content = it) },
-                        onObjectIdChanged = { homeViewModel.updateObcjectId(id = it) },
+                        onObjectIdChanged = { homeViewModel.updateObjectId(id = it) },
                         onInsertClicked = { homeViewModel.insertNote() },
                         onUpdateClicked = { homeViewModel.updateNote() },
                         onDelete = { note -> homeViewModel.deleteNote(note) },
+                        onDetail = { note ->
+                            navController.navigate(Screen.DetailsScreen.withArgs(note._id.toHexString()))
+                            onSelectedItemIndexChange(Screen.DetailsScreen.id)
+                        }
                     )
                 }, title = "Home"
             )
@@ -182,14 +188,26 @@ fun Navigation(
             )
         }
         composable(
-            route = Screen.HistoryScreen.route,
-        ) {
-            TopBar(
-                ScreenComposable = {
-                    HistoryScreen()
-                },
-                title = "History"
+            route = Screen.DetailsScreen.route + "/{id}",
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.StringType
+                    defaultValue = "Default"
+                }
             )
+        ) { entry ->
+            entry.arguments?.getString("id")?.let {
+                TopBar(
+                    ScreenComposable = {
+                        DetailsScreen(
+                            note = homeViewModel.getNoteById(it),
+                            onSaveClicked = { return@DetailsScreen },// TODO ( implement this )
+                            onDeleteClicked = { return@DetailsScreen }// TODO ( implement this )
+                        )
+                    },
+                    title = "Note"
+                )
+            }
         }
     }
 }
