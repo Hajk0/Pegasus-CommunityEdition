@@ -107,7 +107,7 @@ fun DetailsScreen(
             } else {
                 Button(
                     onClick = {
-                        // TODO( implement cancel button )
+                        onDeleteClicked(Note())
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error

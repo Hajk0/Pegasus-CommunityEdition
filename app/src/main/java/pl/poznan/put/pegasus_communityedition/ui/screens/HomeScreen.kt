@@ -42,7 +42,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TextField(
+        /*TextField(
             modifier = Modifier.weight(1f),
             value = objectId,
             onValueChange = onObjectIdChanged,
@@ -59,14 +59,17 @@ fun HomeScreen(
             value = content,
             onValueChange = onContentChanged,
             placeholder = { Text(text = "Content") }
-        )
+        )*/
         Row {
-            Button(onClick = onInsertClicked) {
+            Button(onClick = {
+                navController.navigate(Screen.DetailsScreen.route)
+
+            }) {
                 Text("Add")
             }
-            Button(onClick = onUpdateClicked) {
+            /*Button(onClick = onUpdateClicked) {
                 Text("Update")
-            }
+            }*/
             /*Button(onClick = onDeleteClicked) {
                 Text("Delete")
             }*/

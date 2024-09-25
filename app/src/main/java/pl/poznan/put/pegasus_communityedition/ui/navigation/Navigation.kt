@@ -52,6 +52,7 @@ fun Navigation(
         composable(
             route = Screen.HomeScreen.route
         ) {
+            onSelectedItemIndexChange(Screen.HomeScreen.id)
             TopBar(
                 ScreenComposable = {
                     HomeScreen(
@@ -91,6 +92,7 @@ fun Navigation(
         composable(
             route = Screen.WelcomeScreen.route
         ) {
+            onSelectedItemIndexChange(Screen.WelcomeScreen.id)
             val viewModel = viewModel<SignInViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
             
@@ -164,6 +166,7 @@ fun Navigation(
         composable(
             route = Screen.ProfileScreen.route
         ) {
+            onSelectedItemIndexChange(Screen.ProfileScreen.id)
             TopBar(
                 ScreenComposable = {
                     ProfileScreen(
@@ -196,6 +199,7 @@ fun Navigation(
                 }
             )
         ) { entry ->
+            onSelectedItemIndexChange(Screen.DetailsScreen.id)
             entry.arguments?.getString("id")?.let {
                 TopBar(
                     ScreenComposable = {
@@ -205,13 +209,47 @@ fun Navigation(
                             content = homeViewModel.content.value,
                             onTitleChanged = { homeViewModel.updateTitle(title = it) },
                             onContentChanged = { homeViewModel.updateContent(content = it) },
-                            onSaveClicked = { homeViewModel.updateNote() },// TODO ( implement this )
-                            onDeleteClicked = { return@DetailsScreen }// TODO ( implement this )
+                            onSaveClicked = {
+                                homeViewModel.updateNote()
+                                navController.navigate(Screen.HomeScreen.route)
+                            },
+                            onDeleteClicked = {
+                                homeViewModel.deleteNote(it)
+                                navController.navigate(Screen.HomeScreen.route)
+                            }
                         )
                     },
                     title = "Note"
                 )
             }
+        }
+        composable(
+            route = Screen.DetailsScreen.route
+        ) {
+            onSelectedItemIndexChange(Screen.DetailsScreen.id)
+            homeViewModel.updateTitle("")
+            homeViewModel.updateContent("")
+            homeViewModel.updateObjectId("")
+            TopBar(
+                ScreenComposable = {
+                    DetailsScreen(
+                        note = null,
+                        title = homeViewModel.title.value,
+                        content = homeViewModel.content.value,
+                        onTitleChanged = { homeViewModel.updateTitle(title = it) },
+                        onContentChanged = { homeViewModel.updateContent(content = it) },
+                        onSaveClicked = {
+                            homeViewModel.insertNote()
+                            navController.navigate(Screen.HomeScreen.route)
+                        },
+                        onDeleteClicked = {
+                            navController.navigate(Screen.HomeScreen.route)
+                            onSelectedItemIndexChange(Screen.HomeScreen.id)
+                        }
+                    )
+                },
+                title = "New Note"
+            )
         }
     }
 }
