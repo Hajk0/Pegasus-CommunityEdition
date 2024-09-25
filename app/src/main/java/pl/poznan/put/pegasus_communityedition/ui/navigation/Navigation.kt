@@ -201,7 +201,11 @@ fun Navigation(
                     ScreenComposable = {
                         DetailsScreen(
                             note = homeViewModel.getNoteById(it),
-                            onSaveClicked = { return@DetailsScreen },// TODO ( implement this )
+                            title = homeViewModel.title.value,
+                            content = homeViewModel.content.value,
+                            onTitleChanged = { homeViewModel.updateTitle(title = it) },
+                            onContentChanged = { homeViewModel.updateContent(content = it) },
+                            onSaveClicked = { homeViewModel.updateNote() },// TODO ( implement this )
                             onDeleteClicked = { return@DetailsScreen }// TODO ( implement this )
                         )
                     },

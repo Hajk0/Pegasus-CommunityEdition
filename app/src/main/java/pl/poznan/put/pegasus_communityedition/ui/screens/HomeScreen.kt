@@ -83,6 +83,9 @@ fun HomeScreen(
                 onDelete(note)
             },
             onDetail = { note ->
+                onObjectIdChanged(note._id.toHexString())
+                onTitleChanged(note.title)
+                onContentChanged(note.content)
                 onDetail(note)
             },
         )
