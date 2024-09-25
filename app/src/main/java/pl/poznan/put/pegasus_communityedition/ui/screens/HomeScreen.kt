@@ -42,24 +42,6 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        /*TextField(
-            modifier = Modifier.weight(1f),
-            value = objectId,
-            onValueChange = onObjectIdChanged,
-            placeholder = { Text(text = "Object ID") }
-        )
-        TextField(
-            modifier = Modifier.weight(1f),
-            value = title,
-            onValueChange = onTitleChanged,
-            placeholder = { Text(text = "Title") }
-        )
-        TextField(
-            modifier = Modifier.weight(1f),
-            value = content,
-            onValueChange = onContentChanged,
-            placeholder = { Text(text = "Content") }
-        )*/
         Row {
             Button(onClick = {
                 navController.navigate(Screen.DetailsScreen.route)
@@ -67,19 +49,8 @@ fun HomeScreen(
             }) {
                 Text("Add")
             }
-            /*Button(onClick = onUpdateClicked) {
-                Text("Update")
-            }*/
-            /*Button(onClick = onDeleteClicked) {
-                Text("Delete")
-            }*/
         }
         Spacer(modifier = Modifier.height(24.dp))
-        /*LazyColumn(modifier = Modifier.weight(1f)) {
-            items(items = notes, key = { it._id.toHexString() }) {
-                Text(text = "${it.title}, ${it.timestamp}, ${it.userName}, ${it._id}")
-            }
-        }*/
         NotesList(
             notes = notes,
             onDelete = { note ->

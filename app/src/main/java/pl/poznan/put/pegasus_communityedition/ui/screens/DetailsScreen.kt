@@ -38,10 +38,6 @@ fun DetailsScreen(
     onDeleteClicked: (Note) -> Unit,
 ) {
 
-    // Create mutable states for title and content fields
-    // var title by remember { mutableStateOf(note?.title ?: "") }
-    // var content by remember { mutableStateOf(note?.content ?: "") }
-
     // Main content layout
     Column(
         modifier = Modifier
@@ -96,7 +92,7 @@ fun DetailsScreen(
             // Delete Button
             if (note != null) {
                 Button(
-                    onClick = { onDeleteClicked(note) }, // TODO( check this )
+                    onClick = { onDeleteClicked(note) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
                     ),

@@ -55,7 +55,7 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
 
     private fun observeNotes() {
         viewModelScope.launch {
-            getNotes().collectLatest { fetchedNotes ->
+            getUserNotes().collectLatest { fetchedNotes ->
                 notes.value = fetchedNotes
             }
         }
@@ -63,6 +63,7 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
 
     fun updateUserName(userEmail: String) {
         this.userEmail = userEmail
+        observeNotes()
     }
 
     fun updateTitle(title: String) {
@@ -77,9 +78,23 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
         this.objectId.value = id
     }
 
-    fun getNotes() : Flow<List<Note>> {
+    /*fun getNotes() : Flow<List<Note>> {
         return realm
             .query<Note>()
+            .asFlow()
+            .map { result ->
+                result.list.toList()
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(),
+                emptyList()
+            )
+    }*/
+
+    fun getUserNotes() : Flow<List<Note>> {
+        return realm
+            .query<Note>("userName == $0", userEmail)
             .asFlow()
             .map { result ->
                 result.list.toList()
