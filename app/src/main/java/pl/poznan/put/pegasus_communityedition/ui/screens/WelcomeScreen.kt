@@ -1,5 +1,7 @@
 package pl.poznan.put.pegasus_communityedition.ui.screens
 
+import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +18,7 @@ import androidx.navigation.NavHostController
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import pl.poznan.put.pegasus_communityedition.Screen
+import pl.poznan.put.pegasus_communityedition.ui.services.TrackingService
 import pl.poznan.put.pegasus_communityedition.ui.sign_in.SignInState
 
 @Composable

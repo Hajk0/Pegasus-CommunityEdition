@@ -58,7 +58,7 @@ fun NavBar(navController: NavHostController) {
             description = "Home",
         ),
         NavigationItem(
-            title = Screen.HistoryScreen.route,
+            title = Screen.DetailsScreen.route,
             selectedIcon = Icons.Filled.List,
             unselectedIcon = Icons.Outlined.List,
             description = "History",

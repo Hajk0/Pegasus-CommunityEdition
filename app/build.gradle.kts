@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("kotlin-kapt")
     id("com.google.gms.google-services")
+    id("io.realm.kotlin")
 }
 
 android {
@@ -79,11 +80,6 @@ dependencies {
     val locationVersion = "21.3.0"
     implementation("com.google.android.gms:play-services-location:$locationVersion")
 
-    // Room
-    val roomVersion = "2.6.1"
-    implementation("androidx.room:room-ktx:$roomVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
-
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
@@ -91,5 +87,20 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 
     implementation("androidx.navigation:navigation-compose:2.8.0")
+
+    // Coil
     implementation("io.coil-kt:coil-compose:2.2.2")
+
+    // Retrofit & Gson for API calls
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // Lifecycle components
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
+
+    // Mongo Realm
+    implementation("io.realm.kotlin:library-base:1.11.0")
 }

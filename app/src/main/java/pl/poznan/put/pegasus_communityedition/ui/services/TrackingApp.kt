@@ -5,11 +5,25 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import pl.poznan.put.pegasus_communityedition.ui.data.model.Note
 
 class TrackingApp: Application() {
 
+    companion object {
+        lateinit var realm: Realm
+    }
+
     override fun onCreate() {
         super.onCreate()
+        realm = Realm.open(
+            configuration = RealmConfiguration.create(
+                schema = setOf(
+                    Note::class,
+                )
+            )
+        )
         val channel = NotificationChannel(
             "tracking_channel",
             "Tracking Notifications",
@@ -17,5 +31,6 @@ class TrackingApp: Application() {
         )
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+
     }
 }
