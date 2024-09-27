@@ -25,6 +25,7 @@ fun NotesList(
             NoteCard(
                 title = note.title,
                 content = note.content,
+                online = note.online,
                 onDeleteClick = { onDelete(note) },
                 onDetailClick = { onDetail(note) }
             )

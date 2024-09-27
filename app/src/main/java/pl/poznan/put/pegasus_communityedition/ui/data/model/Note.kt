@@ -12,4 +12,5 @@ class Note : RealmObject {
     var content: String = ""
     var userName: String = ""
     var timestamp: RealmInstant = RealmInstant.now()
+    var online: Boolean = false
 }
