@@ -25,6 +25,7 @@ import pl.poznan.put.pegasus_communityedition.ui.data.model.Note
 fun NoteCard(
     title: String,
     content: String,
+    online: Boolean,
     onDeleteClick: () -> Unit,
     onDetailClick: () -> Unit
 ) {
@@ -77,6 +78,7 @@ fun NoteCard(
                 ) {
                     Text("Delete", color = Color.White)
                 }
+
             }
         }
     }

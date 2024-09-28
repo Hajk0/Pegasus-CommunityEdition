@@ -4,6 +4,9 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.type.Date
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.mongodb.kbson.ObjectId
 import pl.poznan.put.pegasus_communityedition.ui.data.model.Note
 import pl.poznan.put.pegasus_communityedition.ui.services.TrackingApp
@@ -20,6 +24,7 @@ import pl.poznan.put.pegasus_communityedition.ui.services.TrackingApp
 class HomeViewModel(var userEmail: String) : ViewModel() {
 
     private val realm = TrackingApp.realm
+    val firestore = Firebase.firestore
     var note: Note? = null
 
     private fun createSampleEntries() {
@@ -51,6 +56,8 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
 
     init {
         observeNotes()
+        syncRealmToFirestore()
+        syncFirestoreToRealm()
     }
 
     private fun observeNotes() {
@@ -64,6 +71,8 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
     fun updateUserName(userEmail: String) {
         this.userEmail = userEmail
         observeNotes()
+        syncRealmToFirestore()
+        syncFirestoreToRealm()
     }
 
     fun updateTitle(title: String) {
@@ -122,11 +131,19 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             if (title.value.isNotEmpty()) {
                 val note = Note().apply {
+                    _id = ObjectId()
                     title = this@HomeViewModel.title.value
                     content = this@HomeViewModel.content.value
                     userName = this@HomeViewModel.userEmail
                 }
                 realm.write { copyToRealm(note) }
+                /*try {
+                    saveNoteToFirestore(note)
+                    note.online = true
+                } catch (e: Exception) {
+                    note.online = false
+                    Log.e("HomeViewModel", "Error: ${e.message}")
+                }*/
             }
         }
     }
@@ -140,11 +157,18 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
                     content = this@HomeViewModel.content.value
                     userName = this@HomeViewModel.userEmail
                 }
+
                 realm.write {
                     val queriedNote = query<Note>(query = "_id == $0", note._id).first().find()
                     queriedNote?.title = note.title
                     queriedNote?.content = note.content
                 }
+                /*try {
+                    saveNoteToFirestore(note)
+                    note.online = true
+                } catch (e: Exception) {
+                    note.online = false
+                }*/
             }
         }
     }
@@ -158,6 +182,68 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
                     note?.let { delete(it) }
                 } catch (e: Exception) {
                     Log.d("HomeViewModel", "${e.message}")
+                }
+            }
+            firestore.collection("notes").document(id.toHexString()).delete().await()
+        }
+    }
+
+    private fun syncRealmToFirestore() {
+        viewModelScope.launch {
+            realm.query<Note>("userName == $0", userEmail)
+                .asFlow()
+                .collect { realmResults ->
+                    realmResults.list.forEach { note ->
+                        saveNoteToFirestore(note)
+                    }
+                }
+        }
+    }
+
+    private suspend fun saveNoteToFirestore(note: Note) {
+        //try {
+            val noteData = mapOf(
+                "title" to note.title,
+                "content" to note.content,
+                "userName" to note.userName,
+            )
+            firestore.collection("notes")
+                .document(note._id.toHexString())
+                .set(noteData)
+                .await()
+        /*} *//*catch (e: Exception) {
+            Log.e("HomeViewModel", "Error saving note to Firestore: ${e.message}")
+            // TODO( Add bool field in local DB called online and set offline here )
+        }*/
+    }
+
+    private fun syncFirestoreToRealm() {
+        viewModelScope.launch {
+            firestore.collection("notes")
+                .whereEqualTo("userName", userEmail)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.w("HomeViewModel", "Listen failed.", e)
+                        return@addSnapshotListener
+                    }
+
+                    if (snapshot != null && !snapshot.isEmpty) {
+                        for (document in snapshot.documents) {
+                            val note = document.toObject(Note::class.java)
+                            note?._id = ObjectId(document.id)
+                            note?.online = true
+                            insertOrUpdateNoteInRealm(note)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun insertOrUpdateNoteInRealm(note: Note?) {
+        note?.let {
+            viewModelScope.launch(Dispatchers.IO) {
+                realm.write {
+                    copyToRealm(it, UpdatePolicy.ALL)
                 }
             }
         }
