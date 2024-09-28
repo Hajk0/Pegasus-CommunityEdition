@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.type.Date
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +71,8 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
     fun updateUserName(userEmail: String) {
         this.userEmail = userEmail
         observeNotes()
+        syncRealmToFirestore()
+        syncFirestoreToRealm()
     }
 
     fun updateTitle(title: String) {
@@ -128,18 +131,19 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             if (title.value.isNotEmpty()) {
                 val note = Note().apply {
+                    _id = ObjectId()
                     title = this@HomeViewModel.title.value
                     content = this@HomeViewModel.content.value
                     userName = this@HomeViewModel.userEmail
                 }
-                try {
+                realm.write { copyToRealm(note) }
+                /*try {
                     saveNoteToFirestore(note)
                     note.online = true
                 } catch (e: Exception) {
                     note.online = false
                     Log.e("HomeViewModel", "Error: ${e.message}")
-                }
-                realm.write { copyToRealm(note) }
+                }*/
             }
         }
     }
@@ -154,17 +158,17 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
                     userName = this@HomeViewModel.userEmail
                 }
 
-                try {
-                    saveNoteToFirestore(note)
-                    note.online = true
-                } catch (e: Exception) {
-                    note.online = false
-                }
                 realm.write {
                     val queriedNote = query<Note>(query = "_id == $0", note._id).first().find()
                     queriedNote?.title = note.title
                     queriedNote?.content = note.content
                 }
+                /*try {
+                    saveNoteToFirestore(note)
+                    note.online = true
+                } catch (e: Exception) {
+                    note.online = false
+                }*/
             }
         }
     }
@@ -180,8 +184,7 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
                     Log.d("HomeViewModel", "${e.message}")
                 }
             }
-            // TODO( Add deleting from firestore )
-            // firestore.collection("notes").document(id.toHexString()).delete().await()
+            firestore.collection("notes").document(id.toHexString()).delete().await()
         }
     }
 
@@ -203,7 +206,6 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
                 "title" to note.title,
                 "content" to note.content,
                 "userName" to note.userName,
-                "timestamp" to note.timestamp.toString()
             )
             firestore.collection("notes")
                 .document(note._id.toHexString())
@@ -229,6 +231,7 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
                         for (document in snapshot.documents) {
                             val note = document.toObject(Note::class.java)
                             note?._id = ObjectId(document.id)
+                            note?.online = true
                             insertOrUpdateNoteInRealm(note)
                         }
                     }
