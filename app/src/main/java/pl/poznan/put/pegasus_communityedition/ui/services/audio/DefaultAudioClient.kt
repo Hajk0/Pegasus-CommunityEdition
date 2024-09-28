@@ -2,6 +2,7 @@ package pl.poznan.put.pegasus_communityedition.ui.services.audio
 
 import android.content.Context
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
@@ -20,18 +21,28 @@ class DefaultAudioClient (
                 throw AudioClient.AudioException("Missing microphone permission")
             }
 
-            var audioFile: File
-            File(context.cacheDir, "audio_service.mp3").also {
-                recorder.start(it)
-                audioFile = it
-            }
+            while (true) {
 
-            val timer = fixedRateTimer("audioTimer", initialDelay = 0L, period = interval) {
+                var audioFile: File
+                File(context.cacheDir, "audio_service_${System.currentTimeMillis()}.mp3").also {
+                    recorder.start(it)
+                    audioFile = it
+                }
+
+                delay(interval)
+                recorder.stop()
+
                 launch { send(audioFile) }
+
+                delay(interval)
+            /*val timer = fixedRateTimer("audioTimer", initialDelay = 0L, period = interval) {
+                launch { send(audioFile) }
+            }*/
+
             }
 
             awaitClose {
-                timer.cancel()
+                // timer.cancel()
                 recorder.stop()
             }
         }

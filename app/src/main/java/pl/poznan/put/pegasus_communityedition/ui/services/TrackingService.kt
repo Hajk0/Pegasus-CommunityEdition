@@ -6,10 +6,14 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+import android.net.Uri
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,6 +27,9 @@ import pl.poznan.put.pegasus_communityedition.ui.services.audio.AudioClient
 import pl.poznan.put.pegasus_communityedition.ui.services.audio.DefaultAudioClient
 import pl.poznan.put.pegasus_communityedition.ui.services.location.DefaultLocationClient
 import pl.poznan.put.pegasus_communityedition.ui.services.location.LocationClient
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 class TrackingService: Service() {
@@ -33,6 +40,7 @@ class TrackingService: Service() {
     private val recorder by lazy {
         AudioRecorder(applicationContext)
     }
+    private val firestore = Firebase.firestore
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -70,7 +78,7 @@ class TrackingService: Service() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         locationClient
-            .getLocationUpdates(10000L)
+            .getLocationUpdates(100000L)
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
                 val lat = location.latitude.toString()
@@ -78,8 +86,9 @@ class TrackingService: Service() {
                 val updatedNotification = notification.setContentText(
                     "Location: ($lat, $long)"
                 )
-                Log.println(Log.DEBUG, "X(", "Siemano 2")
                 notificationManager.notify(1, updatedNotification.build())
+                // TODO( Store in database )
+                storeLocationInFirestore(lat, long)
             }
             .launchIn(serviceScope)
 
@@ -88,12 +97,68 @@ class TrackingService: Service() {
             .catch { e -> e.printStackTrace() }
             .onEach { audioFile ->
                 // TODO( Store in database )
-                Log.println(Log.DEBUG, "XD", "Siemano")
+                storeAudioInFirestore(audioFile)
             }
             .launchIn(serviceScope)
 
         startForeground(1,
             notification.build())
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun storeLocationInFirestore(latitude: String, longitude: String) {
+        val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+        val currentDate = sdf.format(Date())
+
+        val locationData = hashMapOf(
+            "latitude" to latitude,
+            "longitude" to longitude,
+            "timestamp" to currentDate
+        )
+
+        firestore.collection("locations")
+            .add(locationData)
+            .addOnSuccessListener { documentReference ->
+                Log.d("TrackingService", "Location stored with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.e("TrackingService", "Failed to store location data: ${e.message}")
+            }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun storeAudioInFirestore(audioFile: File) {
+        val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+        val currentDate = sdf.format(Date())
+
+        val storageReference = FirebaseStorage.getInstance().reference.child("audio/${audioFile.name}")
+        val fileUri = Uri.fromFile(audioFile)
+
+        storageReference.putFile(fileUri)
+            .addOnSuccessListener {
+                storageReference.downloadUrl.addOnSuccessListener { uri ->
+                    val audioData = hashMapOf(
+                        "fileName" to audioFile.name,
+                        "fileSize" to audioFile.length(),
+                        "fileUrl" to uri.toString(),
+                        "timestamp" to currentDate
+                    )
+                    Log.d("TrackingService", "Audio file path: ${audioFile.absolutePath}, size: ${audioFile.length()}")
+
+
+                    firestore.collection("audio")
+                        .add(audioData)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("TrackingService", "Audio metadata stored with ID: ${documentReference.id}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("TrackingService", "Failed to store audio metadata: ${e.message}")
+                        }
+                }
+            }
+            .addOnFailureListener {e ->
+                Log.e("TrackingService", "Failed to upload audio file: ${e.message}")
+            }
     }
 
     private fun stop() {
