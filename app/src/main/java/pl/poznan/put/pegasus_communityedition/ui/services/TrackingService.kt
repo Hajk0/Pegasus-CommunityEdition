@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import pl.poznan.put.pegasus_communityedition.R
 import pl.poznan.put.pegasus_communityedition.ui.audio.AudioRecorder
+import pl.poznan.put.pegasus_communityedition.ui.screens.viewmodels.HomeViewModel
 import pl.poznan.put.pegasus_communityedition.ui.services.audio.AudioClient
 import pl.poznan.put.pegasus_communityedition.ui.services.audio.DefaultAudioClient
 import pl.poznan.put.pegasus_communityedition.ui.services.location.DefaultLocationClient
@@ -78,7 +80,7 @@ class TrackingService: Service() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         locationClient
-            .getLocationUpdates(100000L)
+            .getLocationUpdates(10000L) // co 10 sekund
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
                 val lat = location.latitude.toString()
@@ -87,16 +89,14 @@ class TrackingService: Service() {
                     "Location: ($lat, $long)"
                 )
                 notificationManager.notify(1, updatedNotification.build())
-                // TODO( Store in database )
                 storeLocationInFirestore(lat, long)
             }
             .launchIn(serviceScope)
 
         audioClient
-            .getAudioSample(10000L)
+            .getAudioSample(10000L) // co 10 sekund
             .catch { e -> e.printStackTrace() }
             .onEach { audioFile ->
-                // TODO( Store in database )
                 storeAudioInFirestore(audioFile)
             }
             .launchIn(serviceScope)
@@ -113,7 +113,8 @@ class TrackingService: Service() {
         val locationData = hashMapOf(
             "latitude" to latitude,
             "longitude" to longitude,
-            "timestamp" to currentDate
+            "timestamp" to currentDate,
+            "userEmail" to LoggedInUser.userEmail
         )
 
         firestore.collection("locations")
@@ -141,7 +142,8 @@ class TrackingService: Service() {
                         "fileName" to audioFile.name,
                         "fileSize" to audioFile.length(),
                         "fileUrl" to uri.toString(),
-                        "timestamp" to currentDate
+                        "timestamp" to currentDate,
+                        "userEmail" to LoggedInUser.userEmail
                     )
                     Log.d("TrackingService", "Audio file path: ${audioFile.absolutePath}, size: ${audioFile.length()}")
 

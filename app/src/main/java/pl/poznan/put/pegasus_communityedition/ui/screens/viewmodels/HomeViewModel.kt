@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.mongodb.kbson.ObjectId
 import pl.poznan.put.pegasus_communityedition.ui.data.model.Note
+import pl.poznan.put.pegasus_communityedition.ui.services.LoggedInUser
 import pl.poznan.put.pegasus_communityedition.ui.services.TrackingApp
 
 class HomeViewModel(var userEmail: String) : ViewModel() {
@@ -70,6 +71,7 @@ class HomeViewModel(var userEmail: String) : ViewModel() {
 
     fun updateUserName(userEmail: String) {
         this.userEmail = userEmail
+        LoggedInUser.updateUserEmail(userEmail)
         observeNotes()
         syncRealmToFirestore()
         syncFirestoreToRealm()
