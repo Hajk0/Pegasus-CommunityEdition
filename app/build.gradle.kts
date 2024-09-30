@@ -104,4 +104,7 @@ dependencies {
 
     // Mongo Realm
     implementation("io.realm.kotlin:library-base:1.11.0")
+
+    // Firebase Storage
+    implementation(libs.firebase.storage.ktx)
 }

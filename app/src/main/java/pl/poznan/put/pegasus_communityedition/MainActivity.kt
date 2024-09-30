@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionArray.add(Manifest.permission.POST_NOTIFICATIONS)
             permissionArray.add(Manifest.permission.POST_NOTIFICATIONS)
+            permissionArray.add(Manifest.permission.READ_MEDIA_AUDIO)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             permissionArray.add(Manifest.permission.FOREGROUND_SERVICE_MICROPHONE)
