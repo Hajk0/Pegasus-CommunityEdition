@@ -107,4 +107,5 @@ dependencies {
 
     // Firebase Storage
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.androidx.material.icons.extended) // Or the latest version
 }

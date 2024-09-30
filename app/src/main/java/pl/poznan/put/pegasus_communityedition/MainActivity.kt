@@ -21,6 +21,11 @@ import pl.poznan.put.pegasus_communityedition.ui.theme.PegasusCommunityEditionTh
 import java.io.File
 import android.Manifest
 import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 class MainActivity : ComponentActivity() {
 
@@ -60,7 +65,11 @@ class MainActivity : ComponentActivity() {
             0
         )
         setContent {
-            PegasusCommunityEditionTheme {
+            val checkDarkTheme = isSystemInDarkTheme()
+            var darkTheme by remember { mutableStateOf(checkDarkTheme) }
+            PegasusCommunityEditionTheme(
+                darkTheme = darkTheme
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -110,7 +119,13 @@ class MainActivity : ComponentActivity() {
                         }) {
                             Text(text = "Stop foreground service")
                         }*/
-                    NavBar(navController)
+                    NavBar(
+                        navController = navController,
+                        darkTheme = darkTheme,
+                        onThemeChange = {
+                            darkTheme = !darkTheme
+                        }
+                    )
                     // }
                 }
             }

@@ -7,13 +7,16 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -39,6 +42,9 @@ fun Navigation(
     navController: NavHostController,
     onSelectedItemIndexChange: (Int) -> Unit,
     googleAuthUiClient: GoogleAuthUiClient,
+    darkTheme: Boolean,
+    onThemeChange: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val appContext = LocalContext.current.applicationContext
@@ -86,9 +92,12 @@ fun Navigation(
                         onDetail = { note ->
                             navController.navigate(Screen.DetailsScreen.withArgs(note._id.toHexString()))
                             onSelectedItemIndexChange(Screen.DetailsScreen.id)
-                        }
+                        },
                     )
-                }, title = "Home"
+                },
+                title = "Home",
+                darkTheme = darkTheme,
+                onThemeChange = onThemeChange,
             )
         }
         composable(
@@ -153,6 +162,8 @@ fun Navigation(
                     )
                 },
                 title = "Welcome",
+                darkTheme = darkTheme,
+                onThemeChange = onThemeChange,
             )
         }
         composable(
@@ -162,7 +173,9 @@ fun Navigation(
                 ScreenComposable = {
                     StolenDataScreen(navController = navController)
                 },
-                title = "Stolen Data"
+                title = "Stolen Data",
+                darkTheme = darkTheme,
+                onThemeChange = onThemeChange,
             )
         }
         composable(
@@ -189,7 +202,9 @@ fun Navigation(
                         }
                     )
                 },
-                title = "Profile"
+                title = "Profile",
+                darkTheme = darkTheme,
+                onThemeChange = onThemeChange,
             )
         }
         composable(
@@ -221,7 +236,9 @@ fun Navigation(
                             }
                         )
                     },
-                    title = "Note"
+                    title = "Note",
+                    darkTheme = darkTheme,
+                    onThemeChange = onThemeChange,
                 )
             }
         }
@@ -250,7 +267,9 @@ fun Navigation(
                         }
                     )
                 },
-                title = "New Note"
+                title = "New Note",
+                darkTheme = darkTheme,
+                onThemeChange = onThemeChange,
             )
         }
     }

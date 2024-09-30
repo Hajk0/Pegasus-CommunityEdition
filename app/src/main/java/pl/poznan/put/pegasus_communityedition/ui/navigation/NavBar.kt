@@ -31,7 +31,12 @@ import pl.poznan.put.pegasus_communityedition.Screen
 import pl.poznan.put.pegasus_communityedition.ui.sign_in.GoogleAuthUiClient
 
 @Composable
-fun NavBar(navController: NavHostController) {
+fun NavBar(
+    navController: NavHostController,
+    darkTheme: Boolean,
+    onThemeChange: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val appContext = LocalContext.current.applicationContext
     val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
@@ -119,6 +124,8 @@ fun NavBar(navController: NavHostController) {
                     selectedItemIndex = it
                 },
                 googleAuthUiClient = googleAuthUiClient,
+                darkTheme = darkTheme,
+                onThemeChange = onThemeChange,
             )
         }
     }

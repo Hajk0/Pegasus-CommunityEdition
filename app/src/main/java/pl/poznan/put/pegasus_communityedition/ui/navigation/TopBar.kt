@@ -26,6 +26,8 @@ import pl.poznan.put.pegasus_communityedition.ui.sign_in.UserData
 fun TopBar(
     ScreenComposable: @Composable () -> Unit,
     title: String,
+    darkTheme: Boolean,
+    onThemeChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -48,6 +50,11 @@ fun TopBar(
                         onExpandedChange = {
                             expandedMore = it
                         },
+                        darkTheme = darkTheme,
+                        onThemeChange = {
+                            onThemeChange()
+                            expandedMore = false
+                        }
                     )
                 },
                 scrollBehavior = scrollBehavior,

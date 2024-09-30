@@ -10,9 +10,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
-fun MoreDropdown(expanded: Boolean, onExpandedChange: (Boolean) -> Unit) {
+fun MoreDropdown(
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    darkTheme: Boolean,
+    onThemeChange: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Box(
     ) {
         IconButton(onClick = { onExpandedChange(true) }) {
@@ -24,7 +31,7 @@ fun MoreDropdown(expanded: Boolean, onExpandedChange: (Boolean) -> Unit) {
         DropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
             DropdownMenuItem(
                 text = { Text("Change Theme") },
-                onClick = { return@DropdownMenuItem },
+                onClick = onThemeChange,
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Build,
