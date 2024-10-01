@@ -63,9 +63,16 @@ fun NoteCard(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+                val formatText: (String) -> String = { text ->
+                    if (text.length > 30) {
+                        text.replace("\n", " ").take(30) + "..."
+                    } else {
+                        text
+                    }
+                }
                 // Content of the Note
                 Text(
-                    text = content.replace("\n", " ").take(30) + "...",
+                    text = formatText(content),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 16.dp)
