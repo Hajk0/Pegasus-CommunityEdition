@@ -39,30 +39,6 @@ fun WelcomeScreen(
     onSignInState: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    /*val context = LocalContext.current
-    LaunchedEffect(key1 = state.signInError) {
-        state.signInError?.let { error ->
-            Toast.makeText(
-                context,
-                error,
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.google_icon),
-            contentDescription = "Google Icon",
-        )
-        Button(onClick = onSignInState) {
-            Text(text = "Sign in")
-        }
-    }*/
     val context = LocalContext.current
 
     // Show sign-in error toast, if any

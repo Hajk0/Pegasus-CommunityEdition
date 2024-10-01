@@ -46,33 +46,6 @@ fun HomeScreen(
     onDetail: (Note) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    /*Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row {
-            Button(onClick = {
-                navController.navigate(Screen.DetailsScreen.route)
-
-            }) {
-                Text("Add")
-            }
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-        NotesList(
-            notes = notes,
-            onDelete = { note ->
-                onDelete(note)
-            },
-            onDetail = { note ->
-                onObjectIdChanged(note._id.toHexString())
-                onTitleChanged(note.title)
-                onContentChanged(note.content)
-                onDetail(note)
-            },
-        )
-    }*/
     Column(
         modifier = Modifier
             .fillMaxSize()
