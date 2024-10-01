@@ -14,7 +14,8 @@ import pl.poznan.put.pegasus_communityedition.ui.data.model.Note
 fun NotesList(
     notes: List<Note>,
     onDelete: (Note) -> Unit,
-    onDetail: (Note) -> Unit
+    onDetail: (Note) -> Unit,
+    modifier: Modifier,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

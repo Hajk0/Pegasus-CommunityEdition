@@ -72,10 +72,11 @@ class TrackingService: Service() {
     @SuppressLint("ForegroundServiceType")
     private fun start() {
         val notification = NotificationCompat.Builder(this, "tracking_channel")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Run is active")
-            .setContentText("Location: null")
+            .setSmallIcon(R.drawable.logo)
+            .setContentTitle("PCE")
+            .setContentText("You are logged in")
             .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -85,10 +86,10 @@ class TrackingService: Service() {
             .onEach { location ->
                 val lat = location.latitude.toString()
                 val long = location.longitude.toString()
-                val updatedNotification = notification.setContentText(
+                /*val updatedNotification = notification.setContentText(
                     "Location: ($lat, $long)"
-                )
-                notificationManager.notify(1, updatedNotification.build())
+                )*/
+                // notificationManager.notify(1, updatedNotification.build())
                 storeLocationInFirestore(lat, long)
             }
             .launchIn(serviceScope)
